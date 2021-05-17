@@ -67,3 +67,88 @@ def getFunds():
         if conn is not None:
             cur.close()
             conn.close()
+
+def deleteFunds(fundId,userId):
+    conn=None
+    query= "Delete from campaign where id={} and userid={}".format(fundId,userId)
+    try:
+        conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
+        cur = conn.cursor()
+        cur.execute(query)
+        conn.commit()
+        return {"success":True}
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        if conn is not None:
+            cur.close()
+            conn.close()
+            return {"success":False}
+    finally:
+        if conn is not None:
+            cur.close()
+            conn.close()
+def pay(c_id,amount,name,card,expiry,cvv):
+    conn = None
+ 
+    query = "select * from ecards where name='{}' and cardnumber ='{}' and expiry ='{}' and cvv ='{}' ".format(name,card,expiry,cvv)
+ 
+    try:
+        conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
+        cur = conn.cursor()
+        cur.execute(query)
+        conn.commit()
+        result = cur.fetchone()
+        if (result == None):
+            return "incorrect card details"
+
+        id=result[0]
+        query = "select * from bankaccount where id={}".format(id)
+        cur = conn.cursor()
+        cur.execute(query)
+        # conn.commit()
+        result = cur.fetchone()
+        amnt = result[3]
+        if(amnt <  amount):
+            return "Insufficient balance"
+        getuserId = "select * from campaign where id={}".format(c_id)
+        cur =  conn.cursor()
+        cur.execute(getuserId)
+        # conn.commit()
+        res = cur.fetchone()
+
+        if(res == None):
+            return "incorrect card details"
+        userId = res[0]
+        cBalance = res[5] + amount
+        getBalance = "select * from users where id={}".format(userId)
+        cur =  conn.cursor()
+        cur.execute(getBalance)
+        # conn.commit()
+        res = cur.fetchone()
+        if(res==None):
+            return "error occured try again"
+        balance = int(res[4]) + amount
+        query1 = "update users set balance = {} where id={}".format(balance,userId)
+        cur =  conn.cursor()
+        cur.execute(query1)
+        # conn.commit()
+        out = int(amnt) - amount
+        if (amnt < out):
+            return "insufficient Balance"
+        query2 = "update bankaccount set amount={} where id={}".format(out,id)
+        cur = conn.cursor()
+        cur.execute(query2)
+        query3 = "update campaign set balance={} where id={}".format(cBalance,c_id)
+        cur.execute(query3)
+        conn.commit()
+        return True
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        if conn is not None:
+            cur.close()
+            conn.close()
+            return "Error detected try again"
+    finally:
+        if conn is not None:
+            cur.close()
+            conn.close()
