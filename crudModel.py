@@ -152,3 +152,61 @@ def pay(c_id,amount,name,card,expiry,cvv):
         if conn is not None:
             cur.close()
             conn.close()
+
+def withdraw(userId,account,amount):
+    conn = None
+    conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
+    getAmountUser = "select * from users where id={}".format(userId)
+    cur = conn.cursor()
+    cur.execute(getAmountUser)
+    conn.commit()
+    result = cur.fetchone()
+    if(len(result)< 1):
+        return "not allowed"
+    userAmount = result[4]
+    getAmountBank = "select * from bankaccount where id={}".format(account)
+    cur = conn.cursor()
+    cur.execute(getAmountBank)
+    conn.commit()
+    res = cur.fetchone()
+    if(res==None):
+        return "bank account not found"
+    bankAmount = res[3]
+    if(userAmount < amount):
+        return "insufficient balace"
+    userAmount = userAmount - amount
+    if(userAmount<0):
+        return "insufficient balance"
+    bankAmount = bankAmount  + amount
+    updateUser= "update users set balance={} where id={}".format(userAmount,userId)
+    cur = conn.cursor()
+    cur.execute(updateUser)
+    conn.commit()
+    updateBank = "update bankaccount set amount={} where id={}".format(bankAmount,account)
+    cur = conn.cursor()
+    cur.execute(updateBank)
+    conn.commit()
+    transaction = "insert into transactions (userid,type,accountnumber,amount)values({},'Withdraw',{},{})".format(userId,account,amount)
+    cur = conn.cursor()
+    cur.execute(transaction)
+    conn.commit()
+    conn.close()
+    return True
+def getTransactions(userId):
+    conn = None
+    conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
+    query = "select * from transactions where userId={}".format(userId)
+    cur = conn.cursor()
+    cur.execute(query)
+    conn.commit()
+    res = cur.fetchall()
+    response = []
+    for r in res:
+        response.append({
+                "userid":r[0],
+                "id":r[1],
+                "type":r[2],
+                "account":r[3],
+                "amount":r[4]
+            })
+    return response
