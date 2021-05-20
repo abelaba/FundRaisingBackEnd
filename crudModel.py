@@ -210,3 +210,45 @@ def getTransactions(userId):
                 "amount":r[4]
             })
     return response
+
+def getBalance(id):
+    conn = None
+    query = "select * from users where id={}".format(id)
+    try:
+        conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
+        cur = conn.cursor()
+        cur.execute(query)
+        result =  cur.fetchone()
+        print(result)
+        if(result==None):
+            return {"error":"error"}
+        return {"balance": result[4]}
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        conn.close()
+def decline(id):
+    query =  "DELETE FROM campaign where id={}".format(id)
+    conn = None
+    try:
+        conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
+        cur = conn.cursor()
+        cur.execute(query)
+        conn.commit()
+        return "campaign declined"
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        conn.close()
+        return False
+def approve(id):
+    query =  "update  campaign set approved={} where id={}".format(True,id)
+    conn = None
+    try:
+        conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
+        cur = conn.cursor()
+        cur.execute(query)
+        conn.commit()
+        return "campaign Approved"
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+        conn.close()
+        return False  
