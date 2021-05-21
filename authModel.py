@@ -57,3 +57,32 @@ def authenticate(email, password):
         if conn is not None:
             cur.close()
             conn.close()
+
+def verify(token):
+     
+    decoded = jwt.decode(token, AUTHSECRET, algorithms=['HS256'])
+    return decoded
+  
+
+def create(email,username,password):
+    conn = None
+    query = "insert into users (\"email\", \"username\", \"password\",balance ) values('"+email+"','"+username +"','"+password+"',0)"
+
+    try:
+        conn = psycopg2.connect("dbname=" + DBNAME + " user=" + DBUSER +" password=" +DBPASSWORD)
+        cur = conn.cursor()
+        cur.execute(query)
+        conn.commit()
+        return True
+    except (Exception, psycopg2.DatabaseError) as error:
+        
+        if conn is not None:
+            cur.close()
+            conn.close()
+
+        return "Email already exits"
+    finally:
+        if conn is not None:
+            cur.close()
+            conn.close()
+
