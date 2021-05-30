@@ -68,3 +68,47 @@ def client():
         return {'success': False}
     else:        
         return {'success': False}
+
+
+
+@app.route("/addFund",methods=["POST"])
+def addFund():
+    vertification = authModel.verify(request.form.get("token"))
+    userId =  vertification["id"]
+    fundTitle = request.form.get("title")
+    fundCategory = request.form.get("category")
+    fundDescription =  request.form.get("descr")
+    fundGoal =  request.form.get("Goal")
+    addRes = crudModel.newFund(userId,fundTitle,fundCategory,fundDescription,fundGoal)
+    return {'success':addRes}
+@app.route('/getFunds', methods=["GET"])
+def getFunds():
+    Funds =  crudModel.getFunds()
+    return Funds
+@app.route('/delete',methods=["POST"])
+def deleteFunds():
+    vertification = authModel.verify(request.form.get("token"))
+    fundId =  request.form.get("fundId")
+    userId = vertification["id"]
+    if userId:
+        result = crudModel.deleteFunds(fundId,userId)
+        return result
+    else:
+        return False
+@app.route('/pay',methods=["POST"])
+def pay():
+    c_id = int(request.form.get("cid"))
+    amount = int(request.form.get("amount"))
+    name = request.form.get("name")
+    card = request.form.get("card")
+    expiry = request.form.get("expiry")
+    cvv = request.form.get("cvv")
+    result = crudModel.pay(c_id,amount,name,card,expiry,cvv)
+    return {"success":result}
+@app.route('/withdraw', methods=["POST"])
+def withdraw():
+    amount = int(request.form.get("amount"))
+    account = request.form.get("account")
+    userId = request.form.get("id")
+    result = crudModel.withdraw(userId,account,amount)
+    return {"success":result}
