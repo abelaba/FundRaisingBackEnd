@@ -112,3 +112,40 @@ def withdraw():
     userId = request.form.get("id")
     result = crudModel.withdraw(userId,account,amount)
     return {"success":result}
+
+
+@app.route('/Transactions',methods=["GET"])
+def getTransactions():
+    userID = request.args.get("userId")
+    result = crudModel.getTransactions(userID)
+    return json.dumps(result)
+@app.route('/getBalance',methods=["POST"])
+def getBalance():
+    id = json.loads(request.json)
+    id = id["id"]
+    result = crudModel.getBalance(id)
+    return json.dumps(result)
+@app.route("/decline",methods=["POST"])
+def decline():
+    val  = json.dumps(request.json)
+    check = json.loads(val)
+    pas = check["token"]
+    admin =   jwt.decode(pas, AUTHSECRET, algorithms=['HS256'])["admin"]
+    if(admin): 
+        res  = crudModel.decline(int(check["id"]))
+        return {"success":res}    
+    else:
+        return {"success":"not authorized to perform the action"}
+@app.route("/approve",methods=["POST"])
+def approve():
+    val  = json.dumps(request.json)
+    check = json.loads(val)
+    pas = check["token"]
+    admin =   jwt.decode(pas, AUTHSECRET, algorithms=['HS256'])
+    if(admin):
+        res = crudModel.approve(int(check["id"]))
+        return {"success":res}
+    else:
+        return {"success":"not authorized to perform the action"}
+if __name__ == "__main__":
+    app.run(debug=True)
