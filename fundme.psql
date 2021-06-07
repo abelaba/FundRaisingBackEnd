@@ -1,0 +1,531 @@
+--
+-- PostgreSQL database dump
+--
+
+
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: category; Type: TYPE; Schema: public; Owner: postgres
+--
+
+CREATE TYPE public.category AS ENUM (
+    'Health',
+    'Education',
+    'Business'
+);
+
+
+ALTER TYPE public.category OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: admin; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.admin (
+    id integer NOT NULL,
+    email character varying(255) NOT NULL,
+    password text,
+    admin boolean
+);
+
+
+ALTER TABLE public.admin OWNER TO postgres;
+
+--
+-- Name: admin_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.admin_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.admin_id_seq OWNER TO postgres;
+
+--
+-- Name: admin_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.admin_id_seq OWNED BY public.admin.id;
+
+
+--
+-- Name: bankaccount; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.bankaccount (
+    id integer NOT NULL,
+    fname character varying(255),
+    lname character varying(255),
+    amount double precision
+);
+
+
+ALTER TABLE public.bankaccount OWNER TO postgres;
+
+--
+-- Name: bankaccount_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.bankaccount_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.bankaccount_id_seq OWNER TO postgres;
+
+--
+-- Name: bankaccount_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.bankaccount_id_seq OWNED BY public.bankaccount.id;
+
+
+--
+-- Name: blacklist; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.blacklist (
+    token text NOT NULL
+);
+
+
+ALTER TABLE public.blacklist OWNER TO postgres;
+
+--
+-- Name: campaign; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.campaign (
+    userid integer,
+    id integer NOT NULL,
+    title character varying(255),
+    category character varying(255),
+    description character varying(255),
+    balance double precision DEFAULT 0,
+    goal double precision,
+    approved boolean DEFAULT false
+);
+
+
+ALTER TABLE public.campaign OWNER TO postgres;
+
+--
+-- Name: campaign_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.campaign_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.campaign_id_seq OWNER TO postgres;
+
+--
+-- Name: campaign_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.campaign_id_seq OWNED BY public.campaign.id;
+
+
+--
+-- Name: ecards; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ecards (
+    banknumber integer,
+    id integer NOT NULL,
+    name character varying(255),
+    cardnumber character varying(255),
+    expiry character varying(255),
+    cvv character varying(255)
+);
+
+
+ALTER TABLE public.ecards OWNER TO postgres;
+
+--
+-- Name: ecards_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.ecards_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ecards_id_seq OWNER TO postgres;
+
+--
+-- Name: ecards_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.ecards_id_seq OWNED BY public.ecards.id;
+
+
+--
+-- Name: transactions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.transactions (
+    userid integer,
+    id integer NOT NULL,
+    type character varying(255),
+    accountnumber character varying(255),
+    amount double precision
+);
+
+
+ALTER TABLE public.transactions OWNER TO postgres;
+
+--
+-- Name: transactions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.transactions_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.transactions_id_seq OWNER TO postgres;
+
+--
+-- Name: transactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.transactions_id_seq OWNED BY public.transactions.id;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    email character varying(255) NOT NULL,
+    username character varying(255),
+    password text,
+    balance double precision,
+    admin boolean DEFAULT false
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
+
+
+--
+-- Name: admin id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admin ALTER COLUMN id SET DEFAULT nextval('public.admin_id_seq'::regclass);
+
+
+--
+-- Name: bankaccount id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.bankaccount ALTER COLUMN id SET DEFAULT nextval('public.bankaccount_id_seq'::regclass);
+
+
+--
+-- Name: campaign id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.campaign ALTER COLUMN id SET DEFAULT nextval('public.campaign_id_seq'::regclass);
+
+
+--
+-- Name: ecards id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ecards ALTER COLUMN id SET DEFAULT nextval('public.ecards_id_seq'::regclass);
+
+
+--
+-- Name: transactions id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.transactions ALTER COLUMN id SET DEFAULT nextval('public.transactions_id_seq'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Data for Name: admin; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.admin (id, email, password, admin) FROM stdin;
+\.
+
+
+--
+-- Data for Name: bankaccount; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.bankaccount (id, fname, lname, amount) FROM stdin;
+1	user123	lastname	218
+3	user6	lastname	658
+4	user7	lastname	658
+5	user9	lastname	658
+2	user5	lastname	658
+\.
+
+
+--
+-- Data for Name: blacklist; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.blacklist (token) FROM stdin;
+\.
+
+
+--
+-- Data for Name: campaign; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.campaign (userid, id, title, category, description, balance, goal, approved) FROM stdin;
+2	14	money 	Education	this is a help call	1	100	t
+2	21	money 	Education	this is the info	1	100	t
+2	24	This is a new call	Business	this is for the react project i did	101	700	t
+30	22	called	Education	this	51	100	t
+\.
+
+
+--
+-- Data for Name: ecards; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.ecards (banknumber, id, name, cardnumber, expiry, cvv) FROM stdin;
+1	1	user6	101010101013	02/10/2024	0233
+\.
+
+
+--
+-- Data for Name: transactions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.transactions (userid, id, type, accountnumber, amount) FROM stdin;
+2	2	withdraw	1	100
+2	4	withdraw	1	50
+2	5	withdraw	2	50
+2	6	withdraw	1	20
+2	7	withdraw	1	20
+2	8	withdraw	1	50
+2	9	withdraw	1	50
+2	10	withdraw	1	10
+2	11	withdraw	1	10
+2	12	withdraw	1	50
+2	13	withdraw	1	50
+2	14	withdraw	1	100
+\.
+
+
+--
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (id, email, username, password, balance, admin) FROM stdin;
+31	newuser@gmail.com	newuser	7110eda4d09e062aa5e4a390b0a572ac0d2c0220	0	f
+33	123@gmail.com	newuser	7110eda4d09e062aa5e4a390b0a572ac0d2c0220	0	f
+34	1235@gmail.com	newusername	7110eda4d09e062aa5e4a390b0a572ac0d2c0220	0	f
+35	qwe@gmail.com	ww	7110eda4d09e062aa5e4a390b0a572ac0d2c0220	0	f
+30	admin@gmail.com	Admin	b11c6cbd7abd1eeb7ed7f82171e0128df89a879b	50	t
+6	girma@gmail.com	Eyob	7110eda4d09e062aa5e4a390b0a572ac0d2c0220	0	f
+7	new@gmail.com	Eyob	7110eda4d09e062aa5e4a390b0a572ac0d2c0220	0	f
+\.
+
+
+--
+-- Name: admin_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.admin_id_seq', 1, false);
+
+
+--
+-- Name: bankaccount_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.bankaccount_id_seq', 5, true);
+
+
+--
+-- Name: campaign_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.campaign_id_seq', 26, true);
+
+
+--
+-- Name: ecards_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.ecards_id_seq', 1, true);
+
+
+--
+-- Name: transactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.transactions_id_seq', 14, true);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 36, true);
+
+
+--
+-- Name: admin admin_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admin
+    ADD CONSTRAINT admin_pkey PRIMARY KEY (email);
+
+
+--
+-- Name: bankaccount bankaccount_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.bankaccount
+    ADD CONSTRAINT bankaccount_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: blacklist blacklist_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.blacklist
+    ADD CONSTRAINT blacklist_pkey PRIMARY KEY (token);
+
+
+--
+-- Name: campaign campaign_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.campaign
+    ADD CONSTRAINT campaign_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: transactions transactions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.transactions
+    ADD CONSTRAINT transactions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users uq_; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT uq_ UNIQUE (email);
+
+
+--
+-- Name: users users_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_id_key UNIQUE (id);
+
+
+--
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (id, email);
+
+
+--
+-- Name: ecards fk_bank; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ecards
+    ADD CONSTRAINT fk_bank FOREIGN KEY (banknumber) REFERENCES public.bankaccount(id);
+
+
+--
+-- Name: transactions fk_users; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.transactions
+    ADD CONSTRAINT fk_users FOREIGN KEY (userid) REFERENCES public.users(id);
+
+
+--
+-- Name: campaign fk_users; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.campaign
+    ADD CONSTRAINT fk_users FOREIGN KEY (userid) REFERENCES public.users(id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
